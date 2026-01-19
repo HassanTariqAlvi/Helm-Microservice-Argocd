@@ -1,0 +1,54 @@
+fullnameOverride: "front-service"
+nameOverride: "front"
+
+image:
+  repository: hasniawan8/microservice-front-service
+  tag: latest
+
+replicaCount: 1
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "912Mi"
+    cpu: "1000m"
+
+
+# Probe settings
+livenessProbe:
+  enabled: false
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: false
+  path: /health
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+
+ingress:
+  enabled: true
+  hosts:
+    - host: app.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+service:
+  port: 80
+  targetPort: 3000
+
+env:
+  - name: API_URL
+    value: "http://api-service:80"

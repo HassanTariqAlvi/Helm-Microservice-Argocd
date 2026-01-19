@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "microservices.fullname" . }}
+  labels:
+    {{- include "microservices.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.serviceType }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+      {{- if (and (eq .Values.serviceType "NodePort") .Values.service.nodePort) }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "microservices.selectorLabels" . | nindent 4 }}

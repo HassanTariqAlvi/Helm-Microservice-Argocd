@@ -1,0 +1,65 @@
+# Default values for microservices chart
+# This is a generic template - service-specific values in values/ folder
+
+# Service configuration
+fullnameOverride: ""
+nameOverride: ""
+serviceType: ClusterIP
+
+# Image configuration
+image:
+  repository: ""
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Deployment configuration
+replicaCount: 2
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: 
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Service configuration
+service:
+  port: 80
+  targetPort: 80
+  nodePort: null
+
+# Environment variables
+env: []
+
+livenessProbe:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 5
+  periodSeconds: 5
