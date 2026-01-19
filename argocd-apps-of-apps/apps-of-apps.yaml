@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: microservices-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      items:
+      - name: api-service
+        valuesFile: "../app-helmchart/values/api-service.yaml"
+      - name: front-service  
+        valuesFile: "../app-helmchart/values/front-service.yaml"
+      - name: option-service
+        valuesFile: "../app-helmchart/values/option-service.yaml"
+
+
+  
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
+        targetRevision: main
+        path: "app-helmchart"  # Path to your generic chart
+        helm:
+          valueFiles:
+          - '{{valuesFile}}'  # Points to ../app-helmchart/values/*.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
