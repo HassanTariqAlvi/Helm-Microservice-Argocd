@@ -1,0 +1,27 @@
+# argocd-values.yaml
+server:
+  # Access via NodePort/LoadBalancer
+  service:
+    type: NodePort  # or NodePort for local
+  
+  # Disable TLS for local/dev
+  extraArgs:
+    - --insecure
+  
+# Minimal resource limits
+controller:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+
+repoServer:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+
+# Skip Redis HA (single instance)
+redis:
+  enabled: false
+  architecture: standalone
