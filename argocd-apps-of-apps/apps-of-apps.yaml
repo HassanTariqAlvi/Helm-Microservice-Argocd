@@ -1,37 +1,28 @@
-# argocd-apps-of-apps/apps-of-apps.yaml
+---
+# YOUR-SERVICE-NAME-HERE
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  name: microservices-appset
+  name: YOUR-SERVICE-NAME          # 1. Change name
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  generators:
-  - list:
-      elements:
-        - name: api-service
-          valuesFile: "values/api-service.yaml"
-        - name: front-service
-          valuesFile: "values/front-service.yaml"
-        - name: option-service
-          valuesFile: "values/option-service.yaml"
-  template:
-    metadata:
-      name: '{{name}}'
-    spec:
-      project: default
-      source:
-        repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
-        targetRevision: main
-        path: app-helmchart
-        helm:
-          valueFiles:
-          - '{{valuesFile}}'
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: default
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        syncOptions:
-        - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
+    targetRevision: main
+    path: app-helmchart            # 2. Change path (if different)
+    helm:
+      releaseName: YOUR-SERVICE-NAME
+      valueFiles:
+        - values/api-service.yaml  # 3. Change values file
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default       # 4. Change namespace (if different)
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
