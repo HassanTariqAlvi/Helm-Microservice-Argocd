@@ -1,0 +1,7 @@
+# charts/mysql/Chart.yaml
+apiVersion: v2
+name: mysql
+description: Wrapper chart for MySQL deployment
+type: application
+version: 1.0.0
+appVersion: 8.1.0
