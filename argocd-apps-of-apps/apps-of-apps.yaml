@@ -12,25 +12,25 @@ spec:
           # MySQL Database
           - name: mysql
             path: mysql-helmchart
-            namespace: database
+            namespace: default
             valuesFile: ""
             
           # API Service
           - name: api-service
             path: app-helmchart
-            namespace: microservices
+            namespace: default
             valuesFile: values/api-service.yaml
             
           # Front Service
           - name: front-service
             path: app-helmchart
-            namespace: microservices
+            namespace: default
             valuesFile: values/front-service.yaml
             
           # Option Service
           - name: option-service
             path: app-helmchart
-            namespace: microservices
+            namespace: default
             valuesFile: values/option-service.yaml
             
           # Add more services here following the same pattern:
