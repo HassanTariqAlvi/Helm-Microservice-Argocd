@@ -23,5 +23,5 @@ repoServer:
 
 # Skip Redis HA (single instance)
 redis:
-  enabled: false
+  enabled: true
   architecture: standalone
