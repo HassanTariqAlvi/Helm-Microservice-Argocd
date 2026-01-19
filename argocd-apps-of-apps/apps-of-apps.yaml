@@ -8,13 +8,11 @@ spec:
   - list:
       items:
       - name: api-service
-        valuesFile: "../app-helmchart/values/api-service.yaml"
-      - name: front-service  
-        valuesFile: "../app-helmchart/values/front-service.yaml"
+        valuesFile: "values/api-service.yaml"  # ← INSIDE app-helmchart
+      - name: front-service
+        valuesFile: "values/front-service.yaml"  # ← INSIDE app-helmchart
       - name: option-service
-        valuesFile: "../app-helmchart/values/option-service.yaml"
-
-
+        valuesFile: "values/option-service.yaml"  # ← INSIDE app-helmchart
   
   template:
     metadata:
@@ -24,10 +22,10 @@ spec:
       source:
         repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
         targetRevision: main
-        path: "app-helmchart"  # Path to your generic chart
+        path: app-helmchart
         helm:
           valueFiles:
-          - '{{valuesFile}}'  # Points to ../app-helmchart/values/*.yaml
+          - '{{valuesFile}}'  # This resolves to "values/api-service.yaml"
       destination:
         server: https://kubernetes.default.svc
         namespace: default
