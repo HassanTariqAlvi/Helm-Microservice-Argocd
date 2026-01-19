@@ -1,28 +1,74 @@
----
-# YOUR-SERVICE-NAME-HERE
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
-  name: apps          # 1. Change name
+  name: microservices-appset
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
-  source:
-    repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
-    targetRevision: main
-    path: app-helmchart            # 2. Change path (if different)
-    helm:
-      releaseName: apps
-      valueFiles:
-        - values/api-service.yaml  # 3. Change values file
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: default       # 4. Change namespace (if different)
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          # MySQL Database
+          - name: mysql
+            path: mysql-helmchart
+            namespace: database
+            valuesFile: ""
+            
+          # API Service
+          - name: api-service
+            path: app-helmchart
+            namespace: microservices
+            valuesFile: values/api-service.yaml
+            
+          # Front Service
+          - name: front-service
+            path: app-helmchart
+            namespace: microservices
+            valuesFile: values/front-service.yaml
+            
+          # Option Service
+          - name: option-service
+            path: app-helmchart
+            namespace: microservices
+            valuesFile: values/option-service.yaml
+            
+          # Add more services here following the same pattern:
+          # - name: your-service-name
+          #   path: app-helmchart
+          #   namespace: microservices
+          #   valuesFile: values/your-service.yaml
+
+  template:
+    metadata:
+      name: '{{.name}}'
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
+        targetRevision: main
+        path: '{{.path}}'
+        helm:
+          releaseName: '{{.name}}'
+          {{- if .valuesFile }}
+          valueFiles:
+            - '{{.valuesFile}}'
+          {{- end }}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
