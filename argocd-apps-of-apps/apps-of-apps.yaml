@@ -3,7 +3,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: YOUR-SERVICE-NAME          # 1. Change name
+  name: apps          # 1. Change name
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -14,7 +14,7 @@ spec:
     targetRevision: main
     path: app-helmchart            # 2. Change path (if different)
     helm:
-      releaseName: YOUR-SERVICE-NAME
+      releaseName: apps
       valueFiles:
         - values/api-service.yaml  # 3. Change values file
   destination:
