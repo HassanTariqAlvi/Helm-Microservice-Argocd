@@ -53,10 +53,8 @@ spec:
         path: '{{.path}}'
         helm:
           releaseName: '{{.name}}'
-          {{- if .valuesFile }}
           valueFiles:
-            - '{{.valuesFile}}'
-          {{- end }}
+            - '{{if .valuesFile}}{{.valuesFile}}{{else}}values.yaml{{end}}'
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{.namespace}}'
