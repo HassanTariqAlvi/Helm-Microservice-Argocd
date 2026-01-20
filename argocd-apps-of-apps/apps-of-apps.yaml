@@ -14,7 +14,7 @@ spec:
           - name: cert-manager
             path: cert-manager-issuer
             namespace: cert-manager
-            valuesFile: ""
+            valuesFile: "values.yaml"
             
           # MySQL Database
           - name: mysql
