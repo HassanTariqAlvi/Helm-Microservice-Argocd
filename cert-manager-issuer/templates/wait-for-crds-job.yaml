@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-wait-for-crds
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  template:
+    spec:
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for cert-manager CRDs..."
+          for crd in certificates.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io; do
+            until kubectl get crd $crd >/dev/null 2>&1; do
+              echo "Waiting for $crd..."
+              sleep 5
+            done
+            echo "$crd is ready"
+          done
+          echo "All CRDs are ready!"
+      restartPolicy: Never
+  backoffLimit: 0

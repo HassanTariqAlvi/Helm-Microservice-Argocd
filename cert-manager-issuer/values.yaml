@@ -1,0 +1,14 @@
+global:
+  # Enable/disable cert-manager installation
+  certManagerEnabled: true
+
+# cert-manager subchart values
+cert-manager:
+  enabled: true
+  installCRDs: true
+  
+  # Namespace configuration
+  namespace: cert-manager
+  
+  # Replica configuration
+  replicaCount: 1
