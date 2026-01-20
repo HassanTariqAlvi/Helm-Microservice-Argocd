@@ -9,6 +9,12 @@ spec:
   generators:
     - list:
         elements:
+
+          # CertManger & Issuer
+          - name: cert-manager
+            path: cert-manager-issuer
+            namespace: cert-manager
+            
           # MySQL Database
           - name: mysql
             path: mysql-helmchart
