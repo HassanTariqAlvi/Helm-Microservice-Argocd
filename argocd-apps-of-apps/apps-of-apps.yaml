@@ -7,7 +7,6 @@ spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
-<<<<<<< Updated upstream
     - list:
         elements:
           # MySQL Database
@@ -40,17 +39,6 @@ spec:
           #   namespace: microservices
           #   valuesFile: values/your-service.yaml
 
-=======
-  - list:
-      items:
-      - name: api-service
-        valuesFile: "values/api-service.yaml"  # ← INSIDE app-helmchart
-      - name: front-service
-        valuesFile: "values/front-service.yaml"  # ← INSIDE app-helmchart
-      - name: option-service
-        valuesFile: "values/option-service.yaml"  # ← INSIDE app-helmchart
-  
->>>>>>> Stashed changes
   template:
     metadata:
       name: '{{.name}}'
@@ -62,19 +50,11 @@ spec:
       source:
         repoURL: https://github.com/HassanTariqAlvi/Helm-Microservice-Argocd.git
         targetRevision: main
-<<<<<<< Updated upstream
         path: '{{.path}}'
-=======
-        path: app-helmchart
->>>>>>> Stashed changes
         helm:
           releaseName: '{{.name}}'
           valueFiles:
-<<<<<<< Updated upstream
             - '{{if .valuesFile}}{{.valuesFile}}{{else}}values.yaml{{end}}'
-=======
-          - '{{valuesFile}}'  # This resolves to "values/api-service.yaml"
->>>>>>> Stashed changes
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{.namespace}}'
