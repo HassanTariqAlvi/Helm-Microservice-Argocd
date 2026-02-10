@@ -1,0 +1,12 @@
+apiVersion: v2
+name: traefik
+description: Traefik 3.6 with production configurations
+type: application
+version: 1.0.0  # YOUR chart version (wrapper)
+appVersion: "3.6"  # Traefik application version
+
+dependencies:
+  - name: traefik
+    version: 27.0.0  # Traefik's HELM chart version
+    repository: https://helm.traefik.io/traefik
+    condition: traefik.enabled

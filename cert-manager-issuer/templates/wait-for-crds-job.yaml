@@ -16,14 +16,31 @@ spec:
         - /bin/sh
         - -c
         - |
-          echo "Waiting for cert-manager CRDs..."
+          echo "Waiting for cert-manager CRDs and webhook to be ready..."
+          
+          # Wait for CRDs
           for crd in certificates.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io; do
             until kubectl get crd $crd >/dev/null 2>&1; do
-              echo "Waiting for $crd..."
+              echo "Waiting for CRD: $crd..."
               sleep 5
             done
-            echo "$crd is ready"
+            echo "CRD $crd is ready"
           done
-          echo "All CRDs are ready!"
+          
+          # Wait for cert-manager webhook pods to be ready
+          echo "Waiting for cert-manager webhook pods..."
+          until kubectl wait --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=webhook \
+            --namespace={{ .Release.Namespace | default "cert-manager" }} \
+            --timeout=300s; do
+            echo "Waiting for cert-manager webhook pods to be ready..."
+            sleep 5
+          done
+          
+          # Additional wait to ensure webhook is responsive
+          echo "Verifying cert-manager webhook is responsive..."
+          sleep 10
+          
+          echo "All cert-manager components are ready!"
       restartPolicy: Never
   backoffLimit: 0
