@@ -1,14 +1,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-wait-for-crds
+  name: {{ .Release.Name }}-wait-for-cert-manager
   annotations:
     "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
 spec:
   template:
     spec:
+      serviceAccountName: {{ .Release.Name }}-wait-sa
       containers:
       - name: kubectl
         image: bitnami/kubectl:latest
@@ -16,53 +17,27 @@ spec:
         - /bin/sh
         - -c
         - |
-          echo "Waiting for cert-manager to be fully ready..."
-          
-          # 1. First wait for CRDs to exist
-          echo "Step 1: Checking for CRDs..."
+          echo "Waiting for cert-manager CRDs..."
           for crd in certificates.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io; do
             until kubectl get crd $crd >/dev/null 2>&1; do
-              echo "Waiting for CRD: $crd..."
+              echo "Waiting for $crd..."
               sleep 5
             done
-            echo "✓ CRD $crd is ready"
+            echo "$crd is ready"
           done
           
-          # 2. Wait for cert-manager pods to be running
-          echo "Step 2: Waiting for cert-manager pods..."
-          until kubectl wait --for=condition=ready pod \
-            --selector=app.kubernetes.io/instance={{ .Release.Name }}-cert-manager \
-            --namespace={{ .Values.cert-manager.namespace }} \
-            --timeout=300s 2>/dev/null; do
-            echo "Waiting for cert-manager pods to be ready..."
-            sleep 5
-          done
+          echo "Waiting for cert-manager pods to be ready..."
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/instance=cert-manager \
+            -n cert-manager \
+            --timeout=300s
           
-          # 3. Specifically wait for webhook to be ready (most important)
-          echo "Step 3: Waiting for cert-manager webhook..."
-          until kubectl wait --for=condition=ready pod \
-            --selector=app.kubernetes.io/component=webhook \
-            --namespace={{ .Values.cert-manager.namespace }} \
-            --timeout=300s; do
-            echo "Waiting for webhook pod to be ready..."
-            sleep 5
-          done
+          echo "Waiting for cert-manager webhook to be ready..."
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/component=webhook \
+            -n cert-manager \
+            --timeout=300s
           
-          # 4. Wait for webhook service to be available
-          echo "Step 4: Verifying webhook service is available..."
-          until kubectl get svc {{ .Release.Name }}-cert-manager-webhook -n {{ .Values.cert-manager.namespace }} >/dev/null 2>&1; do
-            echo "Waiting for webhook service..."
-            sleep 5
-          done
-          
-          # 5. Additional wait for webhook to be fully functional
-          echo "Step 5: Final verification..."
-          sleep 10
-          
-          # 6. Test that CRDs are actually functional
-          echo "Step 6: Testing CRD functionality..."
-          kubectl api-resources | grep cert-manager.io
-          
-          echo "✅ All cert-manager components are ready!"
+          echo "cert-manager is fully ready!"
       restartPolicy: Never
-  backoffLimit: 6  # Increased for better retry
+  backoffLimit: 3
