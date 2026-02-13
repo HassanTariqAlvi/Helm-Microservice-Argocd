@@ -1,14 +1,18 @@
 global:
-  # Enable/disable cert-manager installation
   certManagerEnabled: true
 
-# cert-manager subchart values
 cert-manager:
   enabled: true
   installCRDs: true
-  
-  # Namespace configuration
   namespace: cert-manager
-  
-  # Replica configuration
   replicaCount: 1
+
+# ClusterIssuer configuration
+clusterIssuer:
+  enabled: true
+  email: hasniawan33@gmail.com
+  # Use staging for testing, production for real certs
+  server: https://acme-v02.api.letsencrypt.org/directory
+  # For production: https://acme-v02.api.letsencrypt.org/directory
+  #  server: https://acme-staging-v02.api.letsencrypt.org/directory
+  # For production: https://acme-v02.api.letsencrypt.org/directory

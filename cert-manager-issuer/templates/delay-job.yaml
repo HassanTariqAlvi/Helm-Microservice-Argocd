@@ -1,0 +1,20 @@
+{{- if .Values.clusterIssuer.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-delay-job
+  namespace: {{ index .Values "cert-manager" "namespace" | default "cert-manager" }}
+  annotations:
+    helm.sh/hook: "pre-install,pre-upgrade"
+    helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: "hook-succeeded,before-hook-creation"
+spec:
+  template:
+    spec:
+      containers:
+      - name: sleep
+        image: busybox:latest
+        command: ["sleep", "120"]
+      restartPolicy: Never
+  backoffLimit: 0
+{{- end }}

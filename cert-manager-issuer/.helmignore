@@ -1,10 +1,11 @@
-# Helm
-charts/
-Chart.lock
-*.tgz
-
-# Helm dependencies (older Helm versions)
-requirements.lock
-
 # Helm local files
 .helmignore
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docs
+README.md

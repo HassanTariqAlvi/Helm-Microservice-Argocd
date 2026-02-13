@@ -23,6 +23,8 @@ ingress:
         - path: /
           pathType: Prefix
 
+
+
 service:
   port: 80
   targetPort: 3001
